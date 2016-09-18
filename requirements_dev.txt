@@ -1,0 +1,6 @@
+pylint
+pytest
+setuptools
+wheel
+
+pyzfs
