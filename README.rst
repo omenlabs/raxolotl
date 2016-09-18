@@ -1,10 +1,6 @@
 raxolotl
 ========
 
-.. image:: https://img.shields.io/pypi/v/raxolotl.svg
-    :target: https://pypi.python.org/pypi/raxolotl
-    :alt: Latest PyPI version
-
 .. image:: https://travis-ci.org/omenlabs/raxolotl.png
    :target: https://travis-ci.org/omenlabs/raxolotl
    :alt: Latest Travis CI build status
@@ -25,6 +21,8 @@ Compatibility
 
 Licence
 -------
+
+GPLv3
 
 Authors
 -------
