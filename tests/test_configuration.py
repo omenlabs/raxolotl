@@ -89,7 +89,8 @@ class TestRaxolotlTarget:
         'snapshots': 23,
         'retries': 5,
         'fsroot': '/',
-        'exclude': []
+        'exclude': [],
+        'user': 'root'
     }
 
     BASE_SETTINGS = {

@@ -35,6 +35,10 @@ class RaxolotlConfiguration(object):
                 'fsroot': {
                     'type': 'string',
                     'default': '/'
+                },
+                'user': {
+                    'type': 'string',
+                    'default': 'root'
                 }
             }
         },
@@ -124,6 +128,10 @@ class RaxolotlTarget(object):
                 'empty': False,
                 'required': True
             },
+            'user': {
+                'type': 'string',
+                'default': self._defaults['user']
+            },
             'exclude': {
                 'type': 'list',
                 'default': []
@@ -203,3 +211,9 @@ class RaxolotlTarget(object):
         """ Number of times to retry """
 
         return self._settings['retries']
+
+    @property
+    def user(self):
+        """ Remote user for rsync """
+
+        return self._settings['user']
