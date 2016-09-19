@@ -1,13 +1,12 @@
 """ Configuration Handlers """
 
-import sys
 import logging
 
 # third party
 import yaml
 
 # module
-from exceptions import *
+from raxolotl.exceptions import * # pylint: disable=wildcard-import
 
 class RaxolotlConfiguration(object):
     """ Load the configuration """
@@ -24,7 +23,7 @@ class RaxolotlConfiguration(object):
     def _merge_defaults(target, defaults):
         """ Merge in defaults if they don't exist in target """
 
-        # XXX: Nothing fancy
+        # Nothing fancy
         for key in defaults:
             if not key in target:
                 target[key] = defaults[key]
@@ -37,8 +36,8 @@ class RaxolotlConfiguration(object):
                 try:
                     config = yaml.load(cfg)
                 except yaml.YAMLError:
-                    logger.exception("Failed to parse configuration file %s",
-                                     filename)
+                    self._logger.exception("Failed to parse configuration file %s",
+                                           filename)
                     raise ConfigurationParseError("Failed to parse configuration file, check logs")
 
         except IOError:
@@ -48,12 +47,14 @@ class RaxolotlConfiguration(object):
         # Basic santiy checks
         for section in self.REQUIRED_SECTIONS:
             if not section in config:
-                message = "Section '{}' does not exists in configuration {}".format(section, filename)
+                message = ("Section '{}' does not exists in configuration {}"
+                          ).format(section, filename)
                 self._logger.error(message)
                 raise ConfigurationError(message)
 
             if not isinstance(config[section], dict):
-                message = "Section '{}' must be a dictionary in configuration {}".format(section, filename)
+                message = ("Section '{}' must be a dictionary in configuration {}"
+                          ).format(section, filename)
                 self._logger.error(message)
                 raise ConfigurationError(message)
 
