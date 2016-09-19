@@ -1,0 +1,11 @@
+defaults:
+  retries: 3
+  snapshots: 23
+targets:
+  mailhost:
+    hostname: mailhost.local
+	exclude:
+	 - /dev
+	 - /proc
+	 - /sys
+	 fsroot: /
