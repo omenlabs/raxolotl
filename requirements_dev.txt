@@ -2,5 +2,4 @@ pylint
 pytest
 setuptools
 wheel
-
-pyzfs
+-rrequirements.txt
