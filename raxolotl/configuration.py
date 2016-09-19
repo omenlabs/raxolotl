@@ -26,23 +26,24 @@ class RaxolotlConfiguration(object):
                 'snapshots': {
                     'type': 'integer',
                     'default': 23
+                },
+                'exclude': {
+                    'type': 'list',
+                    'schema': {'type': 'string'},
+                    'default': []
+                },
+                'fsroot': {
+                    'type': 'string',
+                    'default': '/'
                 }
-            },
-            'targets': {
-                'type': 'dict',
-                'keyschema': {
-                    'type': 'string'
-                }
-            },
-            'exclude': {
-                'type': 'list',
-                'items': {'type': 'string'},
-                'default': []
-            },
-            'fsroot': {
-                'type': 'string',
-                'default': '/'
             }
+        },
+        'targets': {
+            'type': 'dict',
+            'keyschema': {
+                'type': 'string'
+            },
+            'allow_unknown': True
         }
     }
 
@@ -68,10 +69,10 @@ class RaxolotlConfiguration(object):
             raise ConfigurationNotFound("Failed to open configuration file, check logs")
 
         # Do validation
-        self._validate_configuration(config)
+        config = self._validate_configuration(config)
 
         # Create targets
-        for key, settings in config['targets']:
+        for key, settings in config['targets'].iteritems():
             self._targets[key] = RaxolotlTarget(key,
                                                 settings,
                                                 config['defaults'])
@@ -82,8 +83,14 @@ class RaxolotlConfiguration(object):
         validator = cerberus.Validator(self._SCHEMA, )
 
         if not validator.validate(config):
-            raise ConfigurationError("Configuration failed schema validation")
+            message = "Configuration failed schema validation: {}".format(validator.errors)
+            self._logger.error(message)
+            raise ConfigurationError(message)
 
+        config = validator.normalized(config)
+        self._logger.debug("Configuration defaults normalized to: %s", config['defaults'])
+
+        return config
 
     @property
     def targets(self):

@@ -3,9 +3,85 @@ import copy
 import logging
 
 import raxolotl.configuration as conf
-from raxolotl.exceptions import ConfigurationError
+from raxolotl.exceptions import *
 
 LOGGER = logging.getLogger(__name__)
+
+BAD_CONFIG = """
+defaults:
+  - target: f
+targets:
+  asdf: {}
+"""
+
+GOOD_CONFIG = """
+defaults:
+  exclude:
+   - /dev
+   - /sys
+  snapshots: 8
+  retries: 8
+targets:
+  mailserver:
+    hostname: mail.local
+    datastore: tank/backups/mail
+"""
+
+class TestRaxolotlConfiguration:
+
+
+    @pytest.fixture(scope='session')
+    def good_config_file(self, tmpdir_factory):
+
+        good = tmpdir_factory.mktemp('data').join('good.yaml')
+
+        with open(str(good), "w") as f:
+            f.write(GOOD_CONFIG)
+
+        return good
+
+    @pytest.fixture(scope='session')
+    def bad_config_file(self, tmpdir_factory):
+
+        bad = tmpdir_factory.mktemp('data').join('bad.yaml')
+
+        with open(str(bad), "w") as f:
+            f.write(BAD_CONFIG)
+
+        return bad
+
+    @pytest.fixture(scope='session')
+    def junk_yaml_file(self, tmpdir_factory):
+
+        fn = tmpdir_factory.mktemp('data').join('garbage.yaml')
+        with open(str(fn), "w") as f:
+            f.write("name: { 'asdf':")
+
+        return fn
+
+    def test_config_not_found(self):
+
+        config = conf.RaxolotlConfiguration()
+        with pytest.raises(ConfigurationNotFound):
+            config.load_configuration("asdfasdfasdf.yaml")
+
+    def test_bad_yaml(self, junk_yaml_file):
+
+        config = conf.RaxolotlConfiguration()
+        with pytest.raises(ConfigurationParseError):
+            config.load_configuration(str(junk_yaml_file))
+
+    def test_good_config(self, good_config_file):
+        config = conf.RaxolotlConfiguration()
+        config.load_configuration(str(good_config_file))
+
+        assert 'mailserver' in config.targets
+
+    def test_bad_config(self, bad_config_file):
+        config = conf.RaxolotlConfiguration()
+
+        with pytest.raises(ConfigurationError):
+            config.load_configuration(str(bad_config_file))
 
 class TestRaxolotlTarget:
 
